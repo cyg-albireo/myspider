@@ -54,7 +54,7 @@ class Storage(itnews_spider_multi.Spider):
                     print(info['title'])
         db.commit()
         db.close()
-                
+
     #爬取n条新闻信息，存入mysql
     def insert_datas1(self, start_no, end_no):
         db = MySQLdb.connect("localhost", "test", "123456", "spider_datas", charset='utf8')

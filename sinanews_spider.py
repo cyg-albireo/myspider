@@ -20,24 +20,24 @@ class Spider():
     #请求网页信息，返回json数据
     def get_html_json(self, url, page):
         try:
-            header = { 
+            header = {
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:55.0) Gecko/20100101 Firefox/55.0",
                 "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
                 "Accept-Language": "zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3",
                 "Accept-Encoding": "gzip, deflate",
                 "Referer": "https://news.sina.com.cn/society/",
                 "Connection": "keep-alive",
-                "Upgrade-Insecure-Requests": "1" 
+                "Upgrade-Insecure-Requests": "1"
             }
             header['User-Agent'] = random.choice(useragent_pool.user_agents)
             proxy = random.choice(ip_pool.ip_pool)
             param = {"page": page}
             r = requests.get(url = url, proxies = proxy, headers = header, params = param, timeout=300)
-            r.raise_for_status() 
-            r.encoding = 'utf-8' 
-            #return r.text 
+            r.raise_for_status()
+            r.encoding = 'utf-8'
+            #return r.text
             return r.json()
-        except: 
+        except:
             raise BaseException
 
     #把反斜杠去掉，没用到，暂时保留

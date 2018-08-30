@@ -16,7 +16,7 @@ import useragent_pool, ip_pool
 
 class Spider():
     def __init__(self, url):
-        self.url = url 
+        self.url = url
         self.info_url = url + '/NewsAjax/GetAjaxNewsInfo?contentId=' #获取评论数，浏览数
 
     #请求页面信息
@@ -29,15 +29,15 @@ class Spider():
                 "Accept-Encoding": "gzip, deflate",
                 "Referer": "http://zkeeer.space/",
                 "Connection": "keep-alive",
-                "Upgrade-Insecure-Requests": "1" 
+                "Upgrade-Insecure-Requests": "1"
             }
             header['User-Agent'] = random.choice(useragent_pool.user_agents)
             proxy = random.choice(ip_pool.ip_pool)
             r = requests.get(url = url, proxies = proxy, headers = header, timeout=300)
-            r.raise_for_status() 
-            r.encoding = 'utf-8' 
-            return r.text 
-        except: 
+            r.raise_for_status()
+            r.encoding = 'utf-8'
+            return r.text
+        except:
             raise BaseException
 #            print('get html error!')
 
