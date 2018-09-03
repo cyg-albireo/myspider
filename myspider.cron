@@ -1,0 +1,7 @@
+# timing run spiders
+# use "crontab myspider.cron" to enable this config
+# or use "crontab -e" to edit.
+
+1,5 9,20 * * * /home/chenjiawei/code/python/spider/test/myspider/tencentnews_spider.py >> /home/chenjiawei/code/python/spider/test/myspider/log_tencentnews_spider.txt
+10 9 * * 1 /home/chenjiawei/code/python/spider/test/myspider/sinanews_spider.py 1 101 >> /home/chenjiawei/code/python/spider/test/myspider/log_sinanews_spider.txt
+1 20 * * * /home/chenjiawei/code/python/spider/test/myspider/itnews_storage.py >> /home/chenjiawei/code/python/spider/test/myspider/log_itnews_spider.txt

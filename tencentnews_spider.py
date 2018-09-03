@@ -2,7 +2,7 @@
 #coding=utf-8
 
 '''
-抓取新浪新闻，社会分类的基本内容存储到数据库中
+抓取腾讯新闻，要闻分类的基本内容存储到数据库中 (只能获取99页数据，可用crontab定时执行）
 数据库版本：MongoDB shell version v3.4.16
 爬虫线路： requests - bs4
 Python版本： 3.6
@@ -33,57 +33,35 @@ class Spider():
             header['User-Agent'] = random.choice(useragent_pool.user_agents)
             proxy = random.choice(ip_pool.ip_pool)
             param = {"page": page}
-            r = requests.get(url = url, proxies = proxy, headers = header, params = param, timeout=300)
+            r = requests.get(url = url, proxies = proxy, headers = header, params = param, timeout=20)
             r.raise_for_status()
             r.encoding = 'utf-8'
-            #return r.text
             return r.json()
         except:
             raise BaseException
-
-    #把反斜杠去掉，没用到，暂时保留
-    def unicode_transform(self, string):
-        string = string.replace("'", '"')
-        string = string.replace('\n', '')
-        string = "u'" + string + "'"
-        try:
-            string = eval(string)
-            string = re.sub(r'\\', '', string)
-            string = re.sub(r'\"\[', '[', string)
-            string = re.sub(r'\]\"', ']', string)
-            return string
-        except:
-            return
 
     #保存数据到mongodb中
     def insert_to_db(self, start_no, end_no):
         myclient = pymongo.MongoClient("mongodb://localhost:27017/")
         mydb = myclient["spider"]
-        mycol = mydb["sinanews"]
+        mycol = mydb["tencentnews"]
         for i in range(start_no, end_no):
             try:
                 html = self.get_html_json(self.url, i)
-                #html = self.unicode_transform(html)
-                #result_dict = json.loads(html)
-                datas = html["result"]["data"]
+                datas = html["data"]
                 for data in datas:
-                    data['posttime'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(data['ctime'])))
                     data['myinserttime'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-                    try:
-                        data['comment_show'] += 0
-                    except:
-                        data['comment_show'] = 0
                     try:
                         mycol.insert_one(data)
                     except:
                         pass
                 print("page%d insert seccessful." % i)
             except:
-                print("page%d insert wrong. ------------------stress--------------------" % i)
+                print("page%d insert failed. ------------------stress--------------------" % i)
                 pass
 
     #多进程执行
-    def multi_process_execute(self, start=1, end=41):
+    def multi_process_execute(self, start, end):
         offset = (end - start) // 4
         single_num = offset // 5
         p = multiprocessing.Pool()
@@ -102,27 +80,19 @@ class Spider():
         for i in range(5):
             threads[i].join()
 
-base_url = 'https://feed.sina.com.cn/api/roll/get?pageid=123&lid=1367&num=50'
+base_url = 'https://pacaio.match.qq.com/irs/rcd?cid=108&token=349ee24cdf9327a050ddad8c166bd3e3'
 
 if __name__ == '__main__':
     print("**********execute time: " + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + "**********")
     time_start = time.time()
-
-    try:
-        start = int(sys.argv[1])
-        end = int(sys.argv[2])
-    except:
-        start = 0
-        end = 0
-
     s = Spider(base_url)
 #    html = s.get_html_json(base_url, 1)
 #    html = s.unicode_transform(html)
 #    print(html)
 #    print(html["result"]["data"])
-#    s.insert_to_db(1, 20) #单线程
+#    s.insert_to_db(1, 21) #单线程
     #s.multi_process_execute(1, 1801)
-    s.multi_process_execute(start, end)
+    s.multi_process_execute(1, 101)
     time_end = time.time()
     print("time consuming: %.2fs." %(time_end-time_start))
     print("***************end-line***************")
